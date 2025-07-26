@@ -1,99 +1,95 @@
-<script setup lang="ts">
+<template>
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-blue-200">
 
-const items = ref([
-    [
-        {
-            label: 'Benjamin',
-            avatar: {
-                src: 'https://github.com/benjamincanac.png'
-            },
-            type: 'label'
-        }
-    ],
-    [
-        {
-            label: 'Profile',
-            icon: 'i-lucide-user'
-        },
-        {
-            label: 'Billing',
-            icon: 'i-lucide-credit-card'
-        },
-        {
-            label: 'Settings',
-            icon: 'i-lucide-cog',
-            kbds: [',']
-        },
-        {
-            label: 'Keyboard shortcuts',
-            icon: 'i-lucide-monitor'
-        }
-    ],
-    [
-        {
-            label: 'Team',
-            icon: 'i-lucide-users'
-        },
-        {
-            label: 'Invite users',
-            icon: 'i-lucide-user-plus',
-            children: [
-                [
-                    {
-                        label: 'Email',
-                        icon: 'i-lucide-mail'
-                    },
-                    {
-                        label: 'Message',
-                        icon: 'i-lucide-message-square'
-                    }
-                ],
-                [
-                    {
-                        label: 'More',
-                        icon: 'i-lucide-circle-plus'
-                    }
-                ]
-            ]
-        },
-        {
-            label: 'New team',
-            icon: 'i-lucide-plus',
-            kbds: ['meta', 'n']
-        }
-    ],
-    [
-        {
-            label: 'GitHub',
-            icon: 'i-simple-icons-github',
-            to: 'https://github.com/nuxt/ui',
-            target: '_blank'
-        },
-        {
-            label: 'Support',
-            icon: 'i-lucide-life-buoy',
-            to: '/components/dropdown-menu'
-        },
-        {
-            label: 'API',
-            icon: 'i-lucide-cloud',
-            disabled: true
-        }
-    ],
-    [
-        {
-            label: 'Logout',
-            icon: 'i-lucide-log-out',
-            kbds: ['shift', 'meta', 'q']
-        }
-    ]
-])
+            <!-- Logo & Title -->
+            <div class="flex flex-col items-center mb-6">
+                <img src="/logo.png" alt="University Logo" class="w-37.5 h-52.5 mb-2" />
+            </div>
+
+            <!-- Form -->
+            <form @submit.prevent="handleLogin" class="space-y-4">
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input v-model="email" type="email"
+                        class="w-full px-4 py-2 mt-1 border border-gray-700 rounded-md focus:ring focus:ring-blue-200 text-gray-800"
+                        required />
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input v-model="password" type="password"
+                        class="w-full px-4 py-2 mt-1 border border-gray-700 rounded-md focus:ring focus:ring-blue-200 text-gray-800"
+                        required />
+                </div>
+
+                <!-- Remember Me + Forgot Password -->
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center text-sm text-gray-600">
+                        <input v-model="rememberMe" type="checkbox" class="mr-2" />
+                        Remember me
+                    </label>
+
+                    <a href="#" class="text-sm text-blue-600 hover:underline">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-semibold transition">
+                    Login
+                </button>
+
+                <!-- Error Message -->
+                <p v-if="error" class="text-red-600 text-sm text-center">{{ error }}</p>
+            </form>
+
+        </div>
+    </div>
+</template>
+
+
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const email = ref('')
+const password = ref('')
+const error = ref('')
+
+const router = useRouter()
+
+const rememberMe = ref(false)
+
+
+// 👇 Dummy users list for now
+const users = [
+    { email: 'student@university.edu', password: '123456', role: 'student' },
+    { email: 'lecturer@university.edu', password: '123456', role: 'lecturer' },
+    { email: 'hussein.mohammedali@ukh.edu.krd', password: '123456', role: 'lecturer' },
+    { email: 'registry@university.edu', password: '123456', role: 'registry' }
+]
+
+const handleLogin = () => {
+    const user = users.find(u => u.email === email.value && u.password === password.value)
+
+    if (user) {
+        // Store in localStorage for now
+        localStorage.setItem('user', JSON.stringify(user))
+        router.push('/dashboard')
+    } else {
+        error.value = 'Invalid email or password'
+    }
+}
 </script>
 
-<template>
-    <UDropdownMenu :items="items" :ui="{
-        content: 'w-48'
-    }">
-        <UButton icon="i-lucide-menu" color="neutral" variant="outline" />
-    </UDropdownMenu>
-</template>
+<style>
+input:-webkit-autofill {
+    -webkit-text-fill-color: #1f2937 !important;
+    /* Tailwind's gray-800 */
+    /* transition: background-color 9999s ease-in-out 0s; */
+}
+</style>
