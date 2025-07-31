@@ -51,7 +51,6 @@
     </div>
 </template>
 
-
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -59,32 +58,40 @@ import { useRouter } from 'vue-router'
 const email = ref('')
 const password = ref('')
 const error = ref('')
-
+const rememberMe = ref(false)
 const router = useRouter()
 
-const rememberMe = ref(false)
-
-
-// 👇 Dummy users list for now
 const users = [
-    { email: 'student@university.edu', password: '123456', role: 'student' },
-    { email: 'lecturer@university.edu', password: '123456', role: 'lecturer' },
-    { email: 'hussein.mohammedali@ukh.edu.krd', password: '123456', role: 'lecturer' },
-    { email: 'registry@university.edu', password: '123456', role: 'registry' }
+    { email: 'student@university.edu', password: '123456', name: 'Student' },
+    { email: 'lecturer@university.edu', password: '123456', name: 'Lecturer' },
+    { email: 'hussein.mohammedali@ukh.edu.krd', password: '123456', name: 'Hussein' },
+    { email: 'registry@university.edu', password: '123456', name: 'Registry' }
 ]
 
 const handleLogin = () => {
-    const user = users.find(u => u.email === email.value && u.password === password.value)
+  const user = users.find(
+    (u) => u.email === email.value && u.password === password.value
+  )
 
-    if (user) {
-        // Store in localStorage for now
-        localStorage.setItem('user', JSON.stringify(user))
-        router.push('/dashboard')
-    } else {
-        error.value = 'Invalid email or password'
-    }
+  if (user) {
+    const cookieOptions = rememberMe.value
+      ? { path: '/', maxAge: 60 * 60 * 24 * 7, secure: false, sameSite: 'lax' }
+      : { path: '/', maxAge: undefined, secure: false, sameSite: 'lax' }
+
+    console.log('[Login] Cookie options:', cookieOptions)
+
+    const cookie = useCookie('auth_user', cookieOptions)
+    cookie.value = JSON.stringify(user)
+
+    console.log('[Login] Cookie set:', cookie.value)
+    router.push('/dashboard')
+  } else {
+    error.value = 'Invalid email or password'
+  }
 }
+
 </script>
+
 
 <style>
 input:-webkit-autofill {
